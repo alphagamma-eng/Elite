@@ -190,15 +190,13 @@ li:hover {
 let articles = [];
 
 // LOAD ARTICLES (shared wiki)
-fetch("articles.json")
+const url = "https://raw.githubusercontent.com/alphagamma-eng/Elite/main/articles.json";
+
+fetch(url)
   .then(res => res.json())
   .then(data => {
-    articles = data;
-    updateList();
-  })
-  .catch(() => {
-    alert("Gagal memuat artikel.");
-  });
+    const container = document.getElementById('articles');
+
 
 // NAVIGATION
 function goToPage(id) {

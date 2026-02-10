@@ -3,7 +3,7 @@
     "title": "Hello Wiki",
     "sections": [
       {
-        "heading": "Test",
+        "heading": "Section 1",
         "content": "Jika ini muncul, maka articles.json berhasil dibaca."
       }
     ]

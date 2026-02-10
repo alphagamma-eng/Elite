@@ -1,0 +1,11 @@
+[
+  {
+    "title": "Hello Wiki",
+    "sections": [
+      {
+        "heading": "Test",
+        "content": "Jika ini muncul, maka articles.json berhasil dibaca."
+      }
+    ]
+  }
+]

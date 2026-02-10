@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+       <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<title>Elite</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Serif;
+}
+.section-block {
+  margin-bottom: 20px;
+}
+
+#articleContent h2 {
+  border-bottom: 1px solid #aaa;
+  margin-top: 20px;
+  padding-bottom: 5px;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+nav {
+  background: #222;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 20px;
+}
+
+nav button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 6px 8px;
+}
+
+nav button:hover {
+  background: #333;
+  border-radius: 4px;
+}
+
+nav button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+.page {
+  display: none;
+  padding: 25px;
+}
+
+.page.active {
+  display: block;
+}
+.collapsible {
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapsible + .content {
+  display: none;
+  padding-left: 10px;
+  margin-bottom: 10px;
+  border-left: 2px solid #ccc;
+}
+input, textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+textarea {
+  height: 150px;
+}
+
+ul {
+  list-style: none;
+}
+
+li {
+  margin-bottom: 8px;
+  cursor: pointer;
+  color: #0645ad;
+}
+i {
+  color: #eee;
+  margin-right: 6px;
+}
+nav i {
+  color: white;
+}
+li:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <button onclick="goToPage('home')">
+    <i class="fa-solid fa-house"></i>
+  </button>
+
+  <button onclick="goToPage('list')">
+    <i class="fa-solid fa-book"></i>
+  </button>
+
+  <button onclick="goToPage('write')">
+    <i class="fa-solid fa-pen"></i>
+  </button>
+</nav>
+
+<div id="home" class="page active">
+  <h1>Selamat datang di Elite</h1>
+  <p>Wiki sains statis buatan sendiri.</p>
+  <p>•Klik "Artikel" untuk melihat artikel</p>
+  <p>•Klik Tulis untuk membuat artikel sendiri </p>
+  <p>•Klik section untuk membuat section baru</p>
+  <p>*Disclaimer: Disarankan untuk menggunakan Chrome</p>
+  <p>Website rekomendasi:</p>
+  <ul>
+     <li>- https://www.google.com/</li>
+     <li>- https://www.wikipedia.org/</li>
+  </ul>
+  <h3>"Ini baru program catatan, belum dikembangkan menjadi program serius seperti wikipedia"</h3>
+</div>
+
+<div id="list" class="page">
+  <h1>Daftar Artikel</h1>
+  <input id="searchInput" placeholder="Cari...">
+  <ul id="articleList"></ul>
+</div>
+
+<div id="article" class="page">
+  <h1 id="articleTitle"></h1>
+  <div id="articleContent"></div>
+</div>
+
+<div id="write" class="page">
+  <h1>Kontribusi</h1>
+  <p>
+    Wiki ini bersifat <b>statis</b> dan tidak mendukung penulisan langsung.
+  </p>
+  <p>
+    Jika ingin berkontribusi:
+  </p>
+  <ul>
+    <li>• Tulis artikel menggunakan template</li>
+    <li>• Kirim ke admin / pemilik situs</li>
+    <li>• Artikel akan direview lalu dipublikasikan</li>
+  </ul>
+  <p><i>Ini mengikuti mekanisme wiki awal.</i></p>
+</div>
+<script>
+let articles = [];
+
+// LOAD ARTICLES (shared wiki)
+fetch("articles.json")
+  .then(res => res.json())
+  .then(data => {
+    articles = data;
+    updateList();
+  })
+  .catch(() => {
+    alert("Gagal memuat artikel.");
+  });
+
+// NAVIGATION
+function goToPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+
+  if (id === "list") {
+    document.getElementById("searchInput").value = "";
+    updateList();
+  }
+}
+
+// LIST RENDER
+function updateList(filter = "") {
+  const list = document.getElementById("articleList");
+  list.innerHTML = "";
+
+  articles
+    .filter(a => a.title.toLowerCase().includes(filter.toLowerCase()))
+    .forEach((a, i) => {
+      const li = document.createElement("li");
+      li.textContent = a.title;
+      li.onclick = () => openArticle(i);
+      list.appendChild(li);
+    });
+}
+
+// OPEN ARTICLE
+function openArticle(index) {
+  const article = articles[index];
+
+  document.getElementById("articleTitle").innerText = article.title;
+  const contentArea = document.getElementById("articleContent");
+  contentArea.innerHTML = "";
+
+  article.sections.forEach(sec => {
+    const h2 = document.createElement("h2");
+    h2.innerText = sec.heading;
+    h2.classList.add("collapsible");
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "content";
+    wrapper.style.display = "none";
+
+    sec.content.split("\n").forEach(line => {
+      const p = document.createElement("p");
+      p.innerText = line;
+      wrapper.appendChild(p);
+    });
+
+    h2.onclick = () => {
+      wrapper.style.display =
+        wrapper.style.display === "block" ? "none" : "block";
+    };
+
+    contentArea.appendChild(h2);
+    contentArea.appendChild(wrapper);
+  });
+
+  goToPage("article");
+}
+
+// SEARCH
+const searchInput = document.getElementById("searchInput");
+searchInput.addEventListener("input", function () {
+  if (!document.getElementById("list").classList.contains("active")) return;
+  updateList(this.value);
+});
+</script>

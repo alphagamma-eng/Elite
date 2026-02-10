@@ -3,38 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-       <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<title>Elite</title>
-
+<title>Elite Wiki</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Serif;
-}
-.section-block {
-  margin-bottom: 20px;
+body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+h1 { color: #222; }
+#searchInput { width:100%; padding:8px; margin-bottom:15px; font-size:16px; }
+.article { background:#fff; padding:15px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc; }
+.collapsible { cursor:pointer; font-weight:bold; margin:10px 0; color:#0645ad; }
+.collapsible:hover { text-decoration:underline; }
+.content { display:none; padding-left:10px; margin-bottom:10px; border-left:2px solid #ccc; }
+</style>
+</head>
+<body>
+
+<h1>Elite Wiki</h1>
+<p>Selamat datang di mini wiki statis. Semua artikel diambil dari JSON.</p>
+
+<input type="text" id="searchInput" placeholder="Cari artikel...">
+
+<div id="articles"></div>
+
+<script>
+const url = "https://raw.githubusercontent.com/alphagamma-eng/Elite/main/articles.json";
+
+let articlesData = [];
+
+function renderArticles(data) {
+  const container = document.getElementById('articles');
+  container.innerHTML = "";
+
+  data.forEach(article => {
+    const div = document.createElement('div');
+    div.classList.add('article');
+
+    // Article title
+    const title = document.createElement('h2');
+    title.textContent = article.title;
+    div.appendChild(title);
+
+    // Sections
+    if(article.sections) {
+      article.sections.forEach(sec => {
+        const h = document.createElement('div');
+        h.classList.add('collapsible');
+        h.textContent = sec.heading;
+
+        const content = document.createElement('div');
+        content.classList.add('content');
+        sec.content.split("\n").forEach(line => {
+          const p = document.createElement('p');
+          p.textContent = line;
+          content.appendChild(p);
+        });
+
+        h.onclick = () => {
+          content.style.display = content.style.display === "block" ? "none" : "block";
+        };
+
+        div.appendChild(h);
+        div.appendChild(content);
+      });
+    }
+
+    container.appendChild(div);
+  });
 }
 
-#articleContent h2 {
-  border-bottom: 1px solid #aaa;
-  margin-top: 20px;
-  padding-bottom: 5px;
-}
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+// Fetch articles
+fetch(url)
+  .then(res => res.json())
+  .then(data => {
+    articlesData = data.articles;
+    renderArticles(articlesData);
+  })
+  .catch(err => console.error("Error loading JSON:", err));
 
-nav {
-  background: #222;
+// Search filter
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const filter = searchInput.value.toLowerCase();
+  const filtered = articlesData.filter(a => 
+    a.title.toLowerCase().includes(filter) ||
+    (a.sections && a.sections.some(s => s.heading.toLowerCase().includes(filter) || s.content.toLowerCase().includes(filter)))
+  );
+  renderArticles(filtered);
+});
+</script>
+
+</body>
+</html>  background: #222;
   padding: 10px 20px;
   display: flex;
   justify-content: space-between;

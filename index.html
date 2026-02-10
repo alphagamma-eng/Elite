@@ -5,28 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Elite Wiki</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-h1 { color: #222; }
-#searchInput { width:100%; padding:8px; margin-bottom:15px; font-size:16px; }
-.article { background:#fff; padding:15px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc; }
-.collapsible { cursor:pointer; font-weight:bold; margin:10px 0; color:#0645ad; }
+body { font-family:'Poppins', sans-serif; padding:20px; background:#f9f9f9; line-height:1.6; }
+h1 { color:#222; margin-bottom:5px; }
+h2 { margin-top:20px; }
+#searchInput { width:100%; padding:10px; margin:15px 0 25px 0; font-size:16px; border-radius:5px; border:1px solid #ccc; }
+.article { background:#fff; padding:20px; margin-bottom:25px; border-radius:5px; border:1px solid #ccc; box-shadow:1px 1px 5px rgba(0,0,0,0.05); }
+.collapsible { cursor:pointer; font-weight:bold; margin:10px 0; color:#0645ad; position:relative; padding-right:20px; }
+.collapsible::after { content: "▸"; position:absolute; right:0; transition: transform 0.2s; }
+.collapsible.active::after { transform: rotate(90deg); }
 .collapsible:hover { text-decoration:underline; }
-.content { display:none; padding-left:10px; margin-bottom:10px; border-left:2px solid #ccc; }
+.content { display:none; padding-left:15px; margin-bottom:10px; border-left:2px solid #ccc; }
+.content p { margin:5px 0; }
+footer { margin-top:50px; font-size:14px; color:#555; text-align:center; }
 </style>
 </head>
 <body>
 
 <h1>Elite Wiki</h1>
-<p>Selamat datang di mini wiki statis. Semua artikel diambil dari JSON.</p>
+<p>Selamat datang di mini wiki statis. Semua artikel diambil dari <b>JSON</b>. Klik judul section untuk membuka atau menutup.</p>
 
 <input type="text" id="searchInput" placeholder="Cari artikel...">
 
 <div id="articles"></div>
 
+<footer>
+  <p>Ini adalah wiki statis mini. Artikel disediakan untuk eksperimen belajar HTML, CSS, dan JS.</p>
+</footer>
+
 <script>
 const url = "https://raw.githubusercontent.com/alphagamma-eng/Elite/main/articles.json";
-
 let articlesData = [];
 
 function renderArticles(data) {
@@ -37,12 +46,12 @@ function renderArticles(data) {
     const div = document.createElement('div');
     div.classList.add('article');
 
-    // Article title
+    // Judul artikel
     const title = document.createElement('h2');
     title.textContent = article.title;
     div.appendChild(title);
 
-    // Sections
+    // Section collapsible
     if(article.sections) {
       article.sections.forEach(sec => {
         const h = document.createElement('div');
@@ -51,6 +60,7 @@ function renderArticles(data) {
 
         const content = document.createElement('div');
         content.classList.add('content');
+
         sec.content.split("\n").forEach(line => {
           const p = document.createElement('p');
           p.textContent = line;
@@ -59,6 +69,7 @@ function renderArticles(data) {
 
         h.onclick = () => {
           content.style.display = content.style.display === "block" ? "none" : "block";
+          h.classList.toggle("active");
         };
 
         div.appendChild(h);
@@ -70,27 +81,28 @@ function renderArticles(data) {
   });
 }
 
-// Fetch articles
+// Ambil JSON
 fetch(url)
   .then(res => res.json())
   .then(data => {
     articlesData = data.articles;
     renderArticles(articlesData);
   })
-  .catch(err => console.error("Error loading JSON:", err));
+  .catch(err => console.error("Gagal memuat JSON:", err));
 
-// Search filter
+// Filter search
 const searchInput = document.getElementById('searchInput');
 searchInput.addEventListener('input', () => {
   const filter = searchInput.value.toLowerCase();
   const filtered = articlesData.filter(a => 
     a.title.toLowerCase().includes(filter) ||
-    (a.sections && a.sections.some(s => s.heading.toLowerCase().includes(filter) || s.content.toLowerCase().includes(filter)))
+    (a.sections && a.sections.some(s => 
+      s.heading.toLowerCase().includes(filter) || s.content.toLowerCase().includes(filter)
+    ))
   );
   renderArticles(filtered);
 });
 </script>
 
 </body>
-</html>  
-
+</html>

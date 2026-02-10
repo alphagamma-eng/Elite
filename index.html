@@ -4,103 +4,155 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Elite Wiki</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
-body { font-family:'Poppins', sans-serif; padding:20px; background:#f9f9f9; line-height:1.6; }
-h1 { color:#222; margin-bottom:5px; }
-h2 { margin-top:20px; }
-#searchInput { width:100%; padding:10px; margin:15px 0 25px 0; font-size:16px; border-radius:5px; border:1px solid #ccc; }
-.article { background:#fff; padding:20px; margin-bottom:25px; border-radius:5px; border:1px solid #ccc; box-shadow:1px 1px 5px rgba(0,0,0,0.05); }
-.collapsible { cursor:pointer; font-weight:bold; margin:10px 0; color:#0645ad; position:relative; padding-right:20px; }
-.collapsible::after { content: "▸"; position:absolute; right:0; transition: transform 0.2s; }
-.collapsible.active::after { transform: rotate(90deg); }
-.collapsible:hover { text-decoration:underline; }
-.content { display:none; padding-left:15px; margin-bottom:10px; border-left:2px solid #ccc; }
-.content p { margin:5px 0; }
-footer { margin-top:50px; font-size:14px; color:#555; text-align:center; }
-</style>
-</head>
-<body>
-
-<h1>Elite Wiki</h1>
-<p>Selamat datang di mini wiki statis. Semua artikel diambil dari <b>JSON</b>. Klik judul section untuk membuka atau menutup.</p>
-
-<input type="text" id="searchInput" placeholder="Cari artikel...">
-
-<div id="articles"></div>
-
-<footer>
-  <p>Ini adalah wiki statis mini. Artikel disediakan untuk eksperimen belajar HTML, CSS, dan JS.</p>
-</footer>
-
-<script>
-const url = "https://raw.githubusercontent.com/alphagamma-eng/Elite/main/articles.json";
-let articlesData = [];
-
-function renderArticles(data) {
-  const container = document.getElementById('articles');
-  container.innerHTML = "";
-
-  data.forEach(article => {
-    const div = document.createElement('div');
-    div.classList.add('article');
-
-    // Judul artikel
-    const title = document.createElement('h2');
-    title.textContent = article.title;
-    div.appendChild(title);
-
-    // Section collapsible
-    if(article.sections) {
-      article.sections.forEach(sec => {
-        const h = document.createElement('div');
-        h.classList.add('collapsible');
-        h.textContent = sec.heading;
-
-        const content = document.createElement('div');
-        content.classList.add('content');
-
-        sec.content.split("\n").forEach(line => {
-          const p = document.createElement('p');
-          p.textContent = line;
-          content.appendChild(p);
-        });
-
-        h.onclick = () => {
-          content.style.display = content.style.display === "block" ? "none" : "block";
-          h.classList.toggle("active");
-        };
-
-        div.appendChild(h);
-        div.appendChild(content);
-      });
-    }
-
-    container.appendChild(div);
-  });
+* {
+  box-sizing: border-box;
+  font-family: serif;
 }
 
-// Ambil JSON
+body {
+  margin: 0;
+  padding: 16px;
+}
+
+h1 {
+  margin-top: 0;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 8px;
+  color: #0645ad;
+  cursor: pointer;
+}
+
+li:hover {
+  text-decoration: underline;
+}
+
+.section {
+  margin-bottom: 12px;
+}
+
+.section h2 {
+  cursor: pointer;
+  border-bottom: 1px solid #aaa;
+  padding-bottom: 4px;
+}
+
+.section-content {
+  display: none;
+  padding-left: 10px;
+  border-left: 2px solid #ccc;
+}
+
+.back {
+  color: #0645ad;
+  cursor: pointer;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LIST PAGE -->
+<div id="listPage">
+  <h1>Elite Wiki</h1>
+  <input id="search" placeholder="Cari artikel...">
+  <ul id="articleList"></ul>
+</div>
+
+<!-- ARTICLE PAGE -->
+<div id="articlePage" style="display:none;">
+  <div class="back" onclick="showList()">← Kembali</div>
+  <h1 id="articleTitle"></h1>
+  <div id="articleContent"></div>
+</div>
+
+<script>
+let articles = [];
+
+// LOAD DATA
 fetch(url)
   .then(res => res.json())
   .then(data => {
-    articlesData = data.articles;
-    renderArticles(articlesData);
-  })
-  .catch(err => console.error("Gagal memuat JSON:", err));
+    articlesData = data;
 
-// Filter search
-const searchInput = document.getElementById('searchInput');
-searchInput.addEventListener('input', () => {
-  const filter = searchInput.value.toLowerCase();
-  const filtered = articlesData.filter(a => 
-    a.title.toLowerCase().includes(filter) ||
-    (a.sections && a.sections.some(s => 
-      s.heading.toLowerCase().includes(filter) || s.content.toLowerCase().includes(filter)
-    ))
-  );
-  renderArticles(filtered);
+// RENDER LIST
+function renderList(filter = "") {
+  const list = document.getElementById("articleList");
+  list.innerHTML = "";
+
+  articles
+    .filter(a => a.title.toLowerCase().includes(filter.toLowerCase()))
+    .forEach((a, i) => {
+      const li = document.createElement("li");
+      li.innerText = a.title;
+      li.onclick = () => openArticle(i);
+      list.appendChild(li);
+    });
+}
+
+// OPEN ARTICLE
+function openArticle(index) {
+  const article = articles[index];
+
+  document.getElementById("articleTitle").innerText = article.title;
+  const area = document.getElementById("articleContent");
+  area.innerHTML = "";
+
+  article.sections.forEach(sec => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "section";
+
+    const h2 = document.createElement("h2");
+    h2.innerText = sec.heading;
+
+    const content = document.createElement("div");
+    content.className = "section-content";
+
+    sec.content.split("\n").forEach(line => {
+      const p = document.createElement("p");
+      p.innerText = line;
+      content.appendChild(p);
+    });
+
+    h2.onclick = () => {
+      content.style.display =
+        content.style.display === "block" ? "none" : "block";
+    };
+
+    wrapper.appendChild(h2);
+    wrapper.appendChild(content);
+    area.appendChild(wrapper);
+  });
+
+  document.getElementById("listPage").style.display = "none";
+  document.getElementById("articlePage").style.display = "block";
+}
+
+// BACK
+function showList() {
+  document.getElementById("articlePage").style.display = "none";
+  document.getElementById("listPage").style.display = "block";
+}
+
+// SEARCH
+document.getElementById("search").addEventListener("input", e => {
+  renderList(e.target.value);
 });
 </script>
 

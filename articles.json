@@ -1,11 +1,43 @@
-[
-  {
-    "title": "Hello Wiki",
-    "sections": [
-      {
-        "heading": "Section 1",
-        "content": "Jika ini muncul, maka articles.json berhasil dibaca."
-      }
-    ]
-  }
-]
+{
+  "articles": [
+    {
+      "title": "Fisika Dasar",
+      "sections": [
+        {
+          "heading": "Hukum Newton",
+          "content": "Hukum Newton pertama menyatakan bahwa benda akan tetap diam atau bergerak lurus beraturan jika tidak ada gaya yang bekerja padanya.\nHukum kedua menyatakan F = m*a.\nHukum ketiga menyatakan bahwa setiap aksi memiliki reaksi yang sama besar dan berlawanan arah."
+        },
+        {
+          "heading": "Energi",
+          "content": "Energi kinetik adalah energi yang dimiliki benda karena geraknya.\nEnergi potensial adalah energi yang dimiliki benda karena posisinya."
+        }
+      ]
+    },
+    {
+      "title": "Matematika Dasar",
+      "sections": [
+        {
+          "heading": "Aljabar",
+          "content": "Aljabar adalah cabang matematika yang mempelajari simbol dan aturan untuk memanipulasi simbol tersebut.\nContoh: x + 2 = 5"
+        },
+        {
+          "heading": "Geometri",
+          "content": "Geometri mempelajari bentuk, ukuran, dan sifat ruang.\nContoh: Luas segitiga = 0.5 * alas * tinggi"
+        }
+      ]
+    },
+    {
+      "title": "Biologi",
+      "sections": [
+        {
+          "heading": "Sel",
+          "content": "Sel adalah unit dasar kehidupan.\nSel terdiri dari membran, sitoplasma, dan inti sel."
+        },
+        {
+          "heading": "Fotosintesis",
+          "content": "Fotosintesis adalah proses tumbuhan mengubah cahaya matahari menjadi energi kimia.\nPersamaan: 6CO2 + 6H2O → C6H12O6 + 6O2"
+        }
+      ]
+    }
+  ]
+}
